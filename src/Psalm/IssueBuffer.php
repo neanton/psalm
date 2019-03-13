@@ -285,6 +285,22 @@ class IssueBuffer
 
         $codebase = $project_analyzer->getCodebase();
 
+        $after_analysis_hooks = $codebase->config->after_analysis;
+
+        if ($after_analysis_hooks) {
+            $source_control_info = null;
+
+            try {
+                $source_control_info = (new \Psalm\Internal\SourceControl\GitInfoCollector())->collect();
+            } catch (\RuntimeException $e) {
+                // do nothing
+            }
+
+            foreach ($after_analysis_hooks as $after_analysis_hook) {
+                $after_analysis_hook::afterAnalysis($codebase, self::$issues_data, $source_control_info);
+            }
+        }
+
         $error_count = 0;
         $info_count = 0;
 
