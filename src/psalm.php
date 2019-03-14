@@ -52,6 +52,7 @@ $valid_long_options = [
     'php-version:',
     'generate-json-map:',
     'alter',
+    'spirit',
 ];
 
 gc_collect_cycles();
@@ -229,6 +230,11 @@ Options:
     --alter
         Run Psalter
 
+    --spirit[=host]
+        Send data to Spirit, Psalm's GitHub integration tool.
+        `host` is the location of the Spirit server. It defaults to spirit.psalm.dev
+        More information is available at https://psalm.dev/spirit
+
 HELP;
 
     exit;
@@ -399,6 +405,16 @@ if (isset($options['plugin'])) {
     }
 }
 
+if (isset($options['spirit'])) {
+    $spirit_plugin = __DIR__ . '/Psalm/Plugin/SpiritGuide.php';
+
+    if (!file_exists($spirit_plugin)) {
+        die('Could not find Spirit plugin location ' . $spirit_plugin . PHP_EOL);
+    }
+
+    $plugins[] = $spirit_plugin;
+}
+
 $path_to_config = isset($options['c']) && is_string($options['c']) ? realpath($options['c']) : null;
 
 if ($path_to_config === false) {
@@ -546,7 +562,7 @@ if ($config->find_unused_variables) {
 
 /** @var string $plugin_path */
 foreach ($plugins as $plugin_path) {
-    Config::getInstance()->addPluginPath($current_dir . $plugin_path);
+    Config::getInstance()->addPluginPath($plugin_path);
 }
 
 if ($paths_to_check === null) {
