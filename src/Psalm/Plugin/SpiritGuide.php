@@ -37,9 +37,13 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
             // Set HTTP Header for POST request
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($payload))
+            curl_setopt(
+                $ch,
+                CURLOPT_HTTPHEADER,
+                [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($payload)
+                ]
             );
 
             // Submit the POST request
