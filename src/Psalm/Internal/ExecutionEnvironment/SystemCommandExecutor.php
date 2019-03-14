@@ -1,6 +1,6 @@
 <?php
 
-namespace Psalm\Internal\SourceControl;
+namespace Psalm\Internal\ExecutionEnvironment;
 
 /**
  * @author Kitamura Satoshi <with.no.parachute@gmail.com>

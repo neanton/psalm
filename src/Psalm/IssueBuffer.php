@@ -289,15 +289,21 @@ class IssueBuffer
 
         if ($after_analysis_hooks) {
             $source_control_info = null;
+            $build_info = (new \Psalm\Internal\ExecutionEnvironment\BuildInfoCollector($_SERVER))->collect();
 
             try {
-                $source_control_info = (new \Psalm\Internal\SourceControl\GitInfoCollector())->collect();
+                $source_control_info = (new \Psalm\Internal\ExecutionEnvironment\GitInfoCollector())->collect();
             } catch (\RuntimeException $e) {
                 // do nothing
             }
 
             foreach ($after_analysis_hooks as $after_analysis_hook) {
-                $after_analysis_hook::afterAnalysis($codebase, self::$issues_data, $source_control_info);
+                $after_analysis_hook::afterAnalysis(
+                    $codebase,
+                    self::$issues_data,
+                    $build_info,
+                    $source_control_info
+                );
             }
         }
 

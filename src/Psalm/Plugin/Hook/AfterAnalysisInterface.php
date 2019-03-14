@@ -17,6 +17,7 @@ interface AfterAnalysisInterface
     public static function afterAnalysis(
         Codebase $codebase,
         array $issues,
+        array $build_info,
         SourceControlInfo $source_control_info = null
     );
 }

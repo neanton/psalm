@@ -17,10 +17,12 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
     public static function afterAnalysis(
         Codebase $codebase,
         array $issues,
+        array $build_info,
         SourceControlInfo $source_control_info = null
     ) {
         if ($source_control_info instanceof \Psalm\SourceControl\Git\GitInfo) {
             $data = [
+                'build' => $build_info,
                 'git' => $source_control_info->toArray(),
                 'issues' => $issues,
             ];
