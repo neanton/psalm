@@ -20,7 +20,7 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
         array $build_info,
         SourceControlInfo $source_control_info = null
     ) {
-        if ($source_control_info instanceof \Psalm\SourceControl\Git\GitInfo && $build_info) {
+        if ($source_control_info instanceof \Psalm\SourceControl\Git\GitInfo) {
             $data = [
                 'build' => $build_info,
                 'git' => $source_control_info->toArray(),
@@ -35,6 +35,9 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
             curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+            var_dump($payload, $ch);
 
             // Set HTTP Header for POST request
             curl_setopt(
@@ -48,6 +51,8 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
 
             // Submit the POST request
             $result = curl_exec($ch);
+
+            var_dump($result);
 
             // Close cURL session handle
             curl_close($ch);
