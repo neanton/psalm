@@ -20,7 +20,7 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
         array $build_info,
         SourceControlInfo $source_control_info = null
     ) {
-        if ($source_control_info instanceof \Psalm\SourceControl\Git\GitInfo) {
+        if ($source_control_info instanceof \Psalm\SourceControl\Git\GitInfo && $build_info) {
             $data = [
                 'build' => $build_info,
                 'git' => $source_control_info->toArray(),
@@ -30,7 +30,7 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
             $payload = json_encode($data);
 
             // Prepare new cURL resource
-            $ch = curl_init('https://spirit.psalm.dev/telemetry');
+            $ch = curl_init('https://' . $codebase->config->spirit_host . '/telemetry');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             curl_setopt($ch, CURLOPT_POST, true);
