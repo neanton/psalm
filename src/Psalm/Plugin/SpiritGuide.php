@@ -24,7 +24,7 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
             $data = [
                 'build' => $build_info,
                 'git' => $source_control_info->toArray(),
-                'issues' => $issues,
+                'issues' => array_filter($issues, function (array $i) : bool { return $i['severity'] === 'error'; }),
             ];
 
             $payload = json_encode($data);
@@ -37,7 +37,7 @@ class SpiritGuide implements \Psalm\Plugin\Hook\AfterAnalysisInterface
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-            var_dump($payload, $ch);
+            var_dump($payload, 'https://' . $codebase->config->spirit_host . '/telemetry');
 
             // Set HTTP Header for POST request
             curl_setopt(
