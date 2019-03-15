@@ -285,28 +285,6 @@ class IssueBuffer
 
         $codebase = $project_analyzer->getCodebase();
 
-        $after_analysis_hooks = $codebase->config->after_analysis;
-
-        if ($after_analysis_hooks) {
-            $source_control_info = null;
-            $build_info = (new \Psalm\Internal\ExecutionEnvironment\BuildInfoCollector($_SERVER))->collect();
-
-            try {
-                $source_control_info = (new \Psalm\Internal\ExecutionEnvironment\GitInfoCollector())->collect();
-            } catch (\RuntimeException $e) {
-                // do nothing
-            }
-
-            foreach ($after_analysis_hooks as $after_analysis_hook) {
-                $after_analysis_hook::afterAnalysis(
-                    $codebase,
-                    self::$issues_data,
-                    $build_info,
-                    $source_control_info
-                );
-            }
-        }
-
         $error_count = 0;
         $info_count = 0;
 
@@ -372,6 +350,28 @@ class IssueBuffer
                 $project_analyzer->show_snippet,
                 $project_analyzer->show_info
             );
+        }
+
+        $after_analysis_hooks = $codebase->config->after_analysis;
+
+        if ($after_analysis_hooks) {
+            $source_control_info = null;
+            $build_info = (new \Psalm\Internal\ExecutionEnvironment\BuildInfoCollector($_SERVER))->collect();
+
+            try {
+                $source_control_info = (new \Psalm\Internal\ExecutionEnvironment\GitInfoCollector())->collect();
+            } catch (\RuntimeException $e) {
+                // do nothing
+            }
+
+            foreach ($after_analysis_hooks as $after_analysis_hook) {
+                $after_analysis_hook::afterAnalysis(
+                    $codebase,
+                    self::$issues_data,
+                    $build_info,
+                    $source_control_info
+                );
+            }
         }
 
         foreach ($project_analyzer->reports as $format => $path) {
