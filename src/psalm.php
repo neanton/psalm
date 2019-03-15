@@ -52,7 +52,7 @@ $valid_long_options = [
     'php-version:',
     'generate-json-map:',
     'alter',
-    'with-spirit',
+    'with-spirit::',
 ];
 
 gc_collect_cycles();
