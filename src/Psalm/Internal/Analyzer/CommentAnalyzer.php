@@ -529,7 +529,7 @@ class CommentAnalyzer
      * @return ClassLikeDocblockComment
      * @psalm-suppress MixedArrayAccess
      */
-    public static function extractClassLikeDocblockInfo($comment, $line_number)
+    public static function extractClassLikeDocblockInfo(\PhpParser\Node $node, $comment, $line_number)
     {
         $comments = DocComment::parse($comment, $line_number);
 
@@ -621,7 +621,7 @@ class CommentAnalyzer
             $all_methods = (isset($comments['specials']['method']) ? $comments['specials']['method'] : [])
                 + (isset($comments['specials']['psalm-method']) ? $comments['specials']['psalm-method'] : []);
 
-            foreach ($all_methods as $method_entry) {
+            foreach ($all_methods as $line_number => $method_entry) {
                 $method_entry = preg_replace('/[ \t]+/', ' ', trim($method_entry));
 
                 $docblock_lines = [];
@@ -701,7 +701,11 @@ class CommentAnalyzer
 
                 $function_docblock = $docblock_lines ? "/**\n * " . implode("\n * ", $docblock_lines) . "\n*/\n" : "";
 
-                $php_string = '<?php class A { ' . $function_docblock . ' public ' . $function_string . '{} }';
+                $extra_line_count = max(0, $line_number - substr_count($function_docblock, "\n"));
+
+                $php_string = '<?php '
+                    . str_repeat("\n", $extra_line_count)
+                    . 'class A { ' . $function_docblock . ' public ' . $function_string . '{} }';
 
                 try {
                     $statements = \Psalm\Internal\Provider\StatementsProvider::parseStatements($php_string);
@@ -714,6 +718,22 @@ class CommentAnalyzer
                     || !$statements[0]->stmts[0] instanceof \PhpParser\Node\Stmt\ClassMethod
                 ) {
                     throw new DocblockParseException('Badly-formatted @method string ' . $method_entry);
+                }
+
+                $statements[0]->stmts[0]->setAttribute('startFilePos', $node->getAttribute('startFilePos'));
+                $statements[0]->stmts[0]->setAttribute('endFilePos', $node->getAttribute('endFilePos'));
+
+                if ($doc_comment = $statements[0]->stmts[0]->getDocComment()) {
+                    /** @var \PhpParser\Comment\Doc */
+                    $node_doc_comment = $node->getDocComment();
+
+                    $statements[0]->stmts[0]->setDocComment(
+                        new \PhpParser\Comment\Doc(
+                            $doc_comment->getText(),
+                            $line_number,
+                            $node_doc_comment->getFilePos()
+                        )
+                    );
                 }
 
                 $info->methods[] = $statements[0]->stmts[0];

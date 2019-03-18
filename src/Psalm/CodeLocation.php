@@ -169,12 +169,18 @@ class CodeLocation
                 )
             );
 
+            var_dump($preview_lines);
+
             $preview_offset = 0;
 
             $comment_line_offset = $this->docblock_line_number - $this->docblock_start_line_number;
 
             for ($i = 0; $i < $comment_line_offset; ++$i) {
                 $preview_offset += strlen($preview_lines[$i]) + 1;
+            }
+
+            if (!isset($preview_lines[$i])) {
+                throw new \Exception('Should have offset');
             }
 
             $key_line = $preview_lines[$i];

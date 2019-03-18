@@ -855,6 +855,7 @@ class ReflectorVisitor extends PhpParser\NodeVisitorAbstract implements PhpParse
             $docblock_info = null;
             try {
                 $docblock_info = CommentAnalyzer::extractClassLikeDocblockInfo(
+                    $node,
                     (string)$doc_comment,
                     $doc_comment->getLine()
                 );
